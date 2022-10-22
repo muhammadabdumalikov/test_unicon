@@ -23,22 +23,6 @@ export class AttachStaffDto {
   organizationId: number;
   @ApiProperty()
   userId: number;
-}
-
-export class CreateTaskDto {
   @ApiProperty()
   created_by: number;
-  @ApiProperty()
-  project_id: number;
-  @ApiProperty()
-  due_date: Date;
-  @ApiProperty()
-  worker_user_id: number;
-}
-
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {}
-
-export class GetTasksByProject {
-  @ApiProperty({ required: false })
-  projectId?: string;
 }

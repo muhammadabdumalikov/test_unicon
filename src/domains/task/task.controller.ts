@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
-  GetTasksByProject,
   CreateTaskDto,
-} from '../organization/organization.dtos';
+  GetTasksByProject,
+  GetTasksForStaff,
+} from './task.dtos';
 import { TaskService } from './task.service';
 
 ApiTags('Task');
@@ -20,22 +21,32 @@ ApiTags('Task');
 export class TaskController {
   constructor(private readonly service: TaskService) {}
 
-  @Get('/chief')
-  async getTaskByProject(@Query() query: GetTasksByProject) {
-    return this.service.getTasksByProject(query);
+  @Get()
+  async getTasksForStaff(@Query() query: GetTasksForStaff) {
+    return this.service.getTasksForStaff(query);
   }
 
-  @Post('/chief')
+  @Post()
   async createTask(@Body() task: CreateTaskDto): Promise<any> {
     return this.service.createTask(task);
   }
 
-  @Patch('/chief')
+  @Patch('/:taskId')
   async updateTask(
-    @Param() taskId: number,
+    @Param('taskId') taskId: number,
     @Body() task: CreateTaskDto,
   ): Promise<any> {
     return this.service.updateTask(taskId, task);
+  }
+
+  @Post('/accomplish/:taskId')
+  async accomplishTask(@Param('taskId') taskId: number): Promise<any> {
+    return this.service.accomplishTask(taskId);
+  }
+
+  @Get('/:projectId')
+  async getTaskByProject(@Query() query: GetTasksByProject) {
+    return this.service.getTasksByProject(query);
   }
 
   @Delete('/:id/chief')

@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { Task } from '@prisma/client';
 import { PrismaService } from 'prisma.service';
 import {
   CreateTaskDto,
   GetTasksByProject,
   UpdateTaskDto,
-} from '../organization/organization.dtos';
+  GetTasksForStaff,
+} from './task.dtos';
 
 @Injectable()
 export class TaskRepo {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-
-  async createTask(task: CreateTaskDto): Promise<any> {
+  async createTask(task: CreateTaskDto): Promise<Task> {
     const { created_by, due_date, project_id, worker_user_id } = task;
 
     return this.prisma.task.create({
@@ -19,34 +20,58 @@ export class TaskRepo {
         project_id,
         worker_id: worker_user_id,
         due_date,
-        created_by
-      }
-    })
+        created_by,
+      },
+    });
   }
 
-  async getTasksByProject(query: GetTasksByProject): Promise<any> {
+  async getOneTask(taskId: number): Promise<Task> {
+    return this.prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+  }
+
+  async getTasksByProject(query: GetTasksByProject): Promise<Task[]> {
     const { projectId } = query;
     return this.prisma.task.findMany({
       where: {
-        project_id: Number(projectId)
-      }
-    })
+        project_id: projectId,
+      },
+    });
   }
 
-  async updateTask(taskId: number, task: UpdateTaskDto): Promise<any> {
+  async getTasksForStaff(query: GetTasksForStaff): Promise<Task[]> {
+    const { staff_id, status } = query;
+    return this.prisma.task.findMany({
+      where: {
+        status,
+        worker_id: staff_id,
+      },
+    });
+  }
+
+  async updateTask(taskId: number, data: UpdateTaskDto): Promise<Task> {
+    const { created_by, due_date, project_id, worker_user_id } = data;
     return this.prisma.task.update({
       where: {
-        id: taskId
+        id: taskId,
       },
-      data: task
-    })
+      data: {
+        created_by,
+        due_date,
+        project_id,
+        worker_id: worker_user_id,
+      },
+    });
   }
 
-  async deleteTask(taskId: number): Promise<any> {
+  async deleteTask(taskId: number): Promise<Task> {
     return this.prisma.task.delete({
       where: {
-        id: taskId
-      }
-    })
+        id: taskId,
+      },
+    });
   }
 }

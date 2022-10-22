@@ -16,19 +16,19 @@ import { ProjectService } from './project.service';
 export class ProjectController {
   constructor(private readonly service: ProjectService) {}
 
-  @Get('/chief')
+  @Get()
   async getAllProjects(): Promise<any> {
     return this.service.getAllProjects();
   }
 
-  @Post('/chief')
+  @Post()
   async createProject(@Body() project: CreateProjectDto): Promise<any> {
     return this.service.createProject(project);
   }
 
-  @Patch('/chief')
+  @Patch('/:id/chief')
   async updateProject(
-    @Param() projectId: number,
+    @Param('id') projectId: number,
     @Body() project: CreateProjectDto,
   ): Promise<any> {
     return this.service.updateProject(projectId, project);

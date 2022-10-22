@@ -6,19 +6,13 @@ import {
   Param,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   CreateOrganizationDto,
-  GetTasksByProject,
   UpdateOrganizationDto,
 } from './organization.dtos';
-import {
-  AttachStaffDto,
-  CreateProjectDto,
-  CreateTaskDto,
-} from './organization.dtos';
+import { AttachStaffDto } from './organization.dtos';
 import { OrganizationService } from './organization.service';
 
 @ApiTags('Organization')
@@ -31,19 +25,19 @@ export class OrganizationController {
     return this.service.getAllOrganizations();
   }
 
-  @Post('/admin')
+  @Post()
   async createOrganization(
     @Body() organization: CreateOrganizationDto,
   ): Promise<any> {
     return this.service.createOrganization(organization);
   }
 
-  @Post('/admin/attach-staff')
+  @Post('/attach-staff')
   async attachStaffOrganization(@Body() data: AttachStaffDto): Promise<any> {
     return this.service.attachStaffOrganization(data);
   }
 
-  @Patch('/admin/:id')
+  @Patch('/:id')
   async updateOrganization(
     @Param('id') organizationId: number,
     @Body() organization: UpdateOrganizationDto,

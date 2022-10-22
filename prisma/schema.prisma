@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CHIEF
+  STAFF
+}
+
+enum Status {
+  CREATED
+  INPROGRESS
+  DONE
+}
+
+model User {
+  id                       Int                 @id @default(autoincrement())
+  name                     String
+  role                     Role
+  created_by               Int?
+  created_by_relation      User?               @relation("users", fields: [created_by], references: [id])
+  organization             Organization[]
+  project                  Project[]
+  organizationUsers        OrganizationUsers[] @relation("worker")
+  organizationUsersCreator OrganizationUsers[] @relation("creator")
+  users                    User[]              @relation("users")
+  taskCreator              Task[]              @relation("creator")
+  taskWorker               Task[]              @relation("worker")
+}
+
+model Organization {
+  id                  Int                 @id @default(autoincrement())
+  name                String              @db.VarChar(64)
+  created_by          Int
+  created_by_relation User                @relation(fields: [created_by], references: [id])
+  Project             Project[]
+  OrganizationUsers   OrganizationUsers[]
+}
+
+model OrganizationUsers {
+  id                  Int          @id @default(autoincrement())
+  user_id             Int
+  user_id_relation    User         @relation("worker", fields: [user_id], references: [id], onDelete: Cascade)
+  org_id              Int
+  org_id_relation     Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  created_by          Int
+  created_by_relation User         @relation("creator", fields: [created_by], references: [id])
+}
+
+model Project {
+  id                  Int          @id @default(autoincrement())
+  org_id              Int
+  org_id_relation     Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  created_by          Int
+  created_by_relation User         @relation(fields: [created_by], references: [id])
+  Task                Task[]
+}
+
+model Task {
+  id                  Int       @id @default(autoincrement())
+  project_id          Int
+  project_id_relation Project   @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  due_date            DateTime
+  created_by          Int
+  created_by_relation User      @relation("creator", fields: [created_by], references: [id], onDelete: SetNull)
+  worker_id           Int
+  worker_id_relation  User      @relation("worker", fields: [worker_id], references: [id], onDelete: SetNull)
+  status              Status    @default(CREATED)
+  done_at             DateTime?
+  created_at          DateTime  @default(now())
+}

@@ -1,15 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { InjectKnex, Knex } from 'nestjs-knex';
 import { PrismaService } from 'prisma.service';
-import { AttachStaffDto } from 'src/shared/shared.dtos';
 import {
+  AttachStaffDto,
   CreateOrganizationDto,
-  GetTasksByProject,
   UpdateOrganizationDto,
-  UpdateProjectDto,
-  UpdateTaskDto,
 } from './organization.dtos';
-import { CreateProjectDto, CreateTaskDto } from './organization.dtos';
 
 @Injectable()
 export class OrganizationRepo {
@@ -23,8 +18,8 @@ export class OrganizationRepo {
     const { name, created_by } = data;
 
     return this.prisma.organization.create({
-      data
-    })
+      data,
+    });
   }
 
   async updateOrganization(
@@ -33,26 +28,27 @@ export class OrganizationRepo {
   ): Promise<any> {
     const record = await this.prisma.organization.update({
       where: {
-        id: organizationId
+        id: organizationId,
       },
-      data: organization
-    })
+      data: organization,
+    });
   }
 
   async deleteOrganization(organizationId: number): Promise<any> {
     return this.prisma.organization.delete({
       where: {
-        id: organizationId
-      }
-    })
+        id: organizationId,
+      },
+    });
   }
 
   async attachStaffOrganization(data: AttachStaffDto) {
-    const { organizationId, userId } = data;
+    const { organizationId, userId, created_by } = data;
     return this.prisma.organizationUsers.create({
       data: {
         user_id: userId,
         org_id: organizationId,
+        created_by,
       },
     });
   }
